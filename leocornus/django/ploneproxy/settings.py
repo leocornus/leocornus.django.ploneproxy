@@ -50,7 +50,8 @@ ADMIN_MEDIA_PREFIX = '/media/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '@!+pn=pph&o30zaz)u$pq&kx5zy_y_v%-25+#es@91#h0%zgql'
 
-SESSION_COOKIE_NAME = 'sessionid'
+# default is sessionid
+SESSION_COOKIE_NAME = 'ctssessionid'
 # The age of session cookies, in seconds
 SESSION_COOKIE_AGE = 300
 
