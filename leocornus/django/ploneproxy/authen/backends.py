@@ -10,7 +10,7 @@ import urllib2
 from django.db import connection
 from django.contrib.auth.models import User
 
-from leocornus.django.ploneproxy.auth.models import PloneAuthenState
+from leocornus.django.ploneproxy.authen.models import PloneAuthenState
 
 __author__ = "Sean Chen"
 __email__ = "sean.chen@leocorn.com"

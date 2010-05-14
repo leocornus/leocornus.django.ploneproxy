@@ -33,7 +33,7 @@ class PloneAuthenState(Model):
     # we should find it now.
     >>> theOne = PloneAuthenState.objects.get(user_id=1)
     >>> theOne.cookie_value
-    'value'
+    u'value'
     """
 
     user_id = IntegerField(_('User Id'), primary_key=True)
