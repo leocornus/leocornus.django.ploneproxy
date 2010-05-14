@@ -59,7 +59,7 @@ SESSION_COOKIE_AGE = 300
 #SESSION_SAVE_EVERY_REQUEST = True
 
 AUTHENTICATION_BACKENDS = (
-    'leocornus.django.ploneproxy.auth.backends.PloneModelBackend',
+    'leocornus.django.ploneproxy.authen.backends.PloneModelBackend',
 #    'django.contrib.auth.backends.ModelBackend',
     )
 
@@ -92,5 +92,5 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'leocornus.django.ploneproxy.auth',
+    'leocornus.django.ploneproxy.authen',
 )
