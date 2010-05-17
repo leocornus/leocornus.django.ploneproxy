@@ -54,15 +54,15 @@ def isValidSession(req):
     if not cookies.has_key(cookieName):
         return False
 
+    #import pdb; pdb.set_trace()
     sessionId = cookies[cookieName].value
 
     # mod_python fakes the environ, and thus doesn't process SetEnv.  This fixes
     # that so that the following import works
     os.environ.update(req.subprocess_env)
 
-
     from django.contrib.sessions.models import Session
-    from leocornus.django.ploneproxy.auth.models import PloneAuthenState
+    from leocornus.django.ploneproxy.authen.models import PloneAuthenState
     from django import db
     db.reset_queries()
 
@@ -72,12 +72,18 @@ def isValidSession(req):
         except Session.DoesNotExist:
             return False
 
+        sessionData = session.get_decoded()
+        if not sessionData.has_key('_auth_user_id'):
+            # this is not a valid session!
+            return False
+
         if session.expire_date > datetime.now():
             # this is a valid session, update the expre date!
             expiry = settings.SESSION_COOKIE_AGE
             session.expire_date = datetime.now() + timedelta(seconds=expiry)
             session.save()
-            userId = session.get_decoded()['_auth_user_id']
+            # update the state!
+            userId = sessionData['_auth_user_id']
             updatePloneAuthenState(PloneAuthenState, userId, req)
             return True
         else:
@@ -105,6 +111,6 @@ def updatePloneAuthenState(PloneAuthenState, userId, request):
         cookie = Cookie.Cookie(state.cookie_name, state.cookie_value, path='/')
         Cookie.add_cookie(request, cookie)
         # remove the Plone authentication state object.
-        state.delete()
+        #state.delete()
     except PloneAuthenState.DoesNotExist:
         return

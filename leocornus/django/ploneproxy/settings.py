@@ -10,7 +10,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = '/usr/local/rd/django/test-db/simple.db'             # Or path to database file if using sqlite3.
+DATABASE_NAME = '/usr/local/rd/django/test-db/simple1.db'             # Or path to database file if using sqlite3.
 TEST_DATABASE_NAME = '/usr/local/rd/django/test-db/simple-test.db'             # Or path to database file if using sqlite3.
 DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
@@ -62,6 +62,10 @@ AUTHENTICATION_BACKENDS = (
     'leocornus.django.ploneproxy.authen.backends.PloneModelBackend',
 #    'django.contrib.auth.backends.ModelBackend',
     )
+
+# setting for leocornus.django.ploneproxy
+PLONEPROXY_AUTHEN_URL = 'http://internal.host.name/Plone/login_form'
+PLONEPROXY_COOKIE_NAME = '__ac'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
