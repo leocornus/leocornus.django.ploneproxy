@@ -62,7 +62,6 @@ def isValidSession(req):
     os.environ.update(req.subprocess_env)
 
     from django.contrib.sessions.models import Session
-    from leocornus.django.ploneproxy.authen.models import PloneAuthenState
     from django import db
     db.reset_queries()
 
@@ -82,35 +81,8 @@ def isValidSession(req):
             expiry = settings.SESSION_COOKIE_AGE
             session.expire_date = datetime.now() + timedelta(seconds=expiry)
             session.save()
-            # update the state!
-            userId = sessionData['_auth_user_id']
-            updatePloneAuthenState(PloneAuthenState, userId, req)
             return True
         else:
             return False
     finally:
         db.connection.close()
-
-# update the Plone authentication state.
-def updatePloneAuthenState(PloneAuthenState, userId, request):
-    """
-    check the plone authentecation state table to see if there is newer cookie
-    issued for this user?
-    - if there is newer cookie, set up the newer cookie.  Normally,
-      this only happens when user log in successfully!
-      - once set up the newer cookie, we will remove the object from
-        the PloneAuthenState.
-    - if there is no newer cookie, continue!
-    """
-
-    try:
-        state = PloneAuthenState.objects.get(user_id=userId)
-        state.cookie_name
-        state.cookie_value
-        # issue the cookie to client.
-        cookie = Cookie.Cookie(state.cookie_name, state.cookie_value, path='/')
-        Cookie.add_cookie(request, cookie)
-        # remove the Plone authentication state object.
-        #state.delete()
-    except PloneAuthenState.DoesNotExist:
-        return
