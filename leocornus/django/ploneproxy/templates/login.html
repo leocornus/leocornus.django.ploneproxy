@@ -1,8 +1,12 @@
+{% extends "registration/base.html" %}
+
+{% block content %}
+
 {% if form.has_errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}                                                                  
                                                                               
-<form method="post" action="{% url django.contrib.auth.views.login %}">
+<form method="post" action="{% url leocornus.django.ploneproxy.views.login %}">
 <table>
 <tr>
   <td><label for="id_username">Username:</label>
@@ -16,3 +20,5 @@
 <input type="submit" value="login" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form> 
+
+{% endblock %}
