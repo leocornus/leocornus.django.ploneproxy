@@ -28,7 +28,12 @@ def authenhandler(request):
     if isValidSession(request):
         return apache.OK
     else:
-        util.redirect(request, "/ext/login?next=%s" % request.unparsed_uri)
+        # introduce a Python option for the login url, so we could configure
+        # it in httpd.conf, PythonOption or SetEnv
+        options = request.get_options()
+        login_url = options.get('PLONEPROXY_LOGIN_URL', '/ext/login')
+        # we will use the default Django REDIRECT_FIELD_NAME: next
+        util.redirect(request, "%s?next=%s" % (login_url, request.unparsed_uri))
         return apache.HTTP_UNAUTHORIZED
 
 def isValidSession(req):
