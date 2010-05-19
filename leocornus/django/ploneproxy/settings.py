@@ -66,6 +66,7 @@ AUTHENTICATION_BACKENDS = (
 # setting for leocornus.django.ploneproxy
 PLONEPROXY_AUTHEN_URL = 'http://internal.host.name/Plone/login_form'
 PLONEPROXY_COOKIE_NAME = '__ac'
+PLONEPROXY_LANG_PARAM_NAME = 'ldp_lang'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -78,7 +79,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'leocornus.django.ploneproxy.authen.middleware.PloneCookieMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    'leocornus.django.ploneproxy.middleware.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
