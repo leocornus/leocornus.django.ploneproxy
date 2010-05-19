@@ -1,21 +1,43 @@
-{% extends "registration/base.html" %}
+{% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
 
-{% if form.has_errors %}
+{% if form.errors_message %}
 <p>Your username and password didn't match. Please try again.</p>
-{% endif %}                                                                  
-                                                                              
+{% endif %}
+
+{{ form.errors }}
+
 <form method="post" action="{% url leocornus.django.ploneproxy.views.login %}">
-<table>
+<table><tbody>
 <tr>
-  <td><label for="id_username">Username:</label>
-  </td><td>{{ form.username }}</td>
+  <td>
+    <label for="id_username">Username:</label>
+    {{ form.username.errors }}
+  </td>
+  <td>
+    {{ form.username }}
+  </td>
 </tr>
 <tr>
-  <td><label for="id_password">Password:</label></td>
-  <td>{{ form.password }}</td></tr>
-</table>
+  <td>
+    <label for="id_password">Password:</label>
+    {{ form.password.errors }}
+  </td>
+  <td>
+    {{ form.password }}
+  </td>
+</tr>
+<tr>
+  <td>
+    <input type="checkbox" name="accept_disclaimer"/>
+  </td>
+  <td>
+    {% trans 'Yes, I accept the disclaimer' %}
+  </td>
+</tr>
+</tbody></table>
         
 <input type="submit" value="login" />
 <input type="hidden" name="next" value="{{ next }}" />

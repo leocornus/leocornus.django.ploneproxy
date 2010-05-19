@@ -32,6 +32,8 @@ def login(request, template_name='login.html',
 
     redirect_to = request.REQUEST.get(redirect_field_name, '')
 
+    accept = request.POST.get('accept_disclaimer', '')
+
     if request.method == "POST":
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -48,11 +50,14 @@ def login(request, template_name='login.html',
             return HttpResponseRedirect(redirect_to)
     else:
         form = AuthenticationForm(request)
+
     request.session.set_test_cookie()
     if Site._meta.installed:
         current_site = Site.objects.get_current()
     else:
         current_site = RequestSite(request)
+
+    import pdb; pdb.set_trace()
     return render_to_response(template_name, {
         'form': form,
         redirect_field_name: redirect_to,

@@ -72,8 +72,13 @@ class PloneModelBackend(object):
         login_form['form.submitted'] = '1'
         body = urllib.urlencode(login_form)
 
-        res, cont = http.request(login_url, 'POST', headers=headers, body=body)
-
+        try:
+            res, cont = http.request(login_url, 'POST',
+                                     headers=headers, body=body)
+        except Exception:
+            # not valid login url!
+            return None
+        
         if res.has_key('set-cookie'):
             cookie = SimpleCookie()
             cookie.load(res['set-cookie'])
