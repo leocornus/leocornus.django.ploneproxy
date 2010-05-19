@@ -60,7 +60,6 @@ def login(request, template_name='login.html',
     uri =  request.build_absolute_uri()
     lang_name, lang_link = prepareOtherLang(request.REQUEST, lang, uri)
 
-    import pdb; pdb.set_trace()
     return render_to_response(template_name, {
         'form': form,
         redirect_field_name: redirect_to,
