@@ -49,6 +49,7 @@ def login(request, template_name='login.html',
     else:
         form = AuthenticationForm(request)
 
+    import pdb; pdb.set_trace()
     request.session.set_test_cookie()
     if Site._meta.installed:
         current_site = Site.objects.get_current()
@@ -76,7 +77,7 @@ def prepareOtherLang(req, currentLang, uri):
 
     if currentLang == 'en':
         lang_code = 'fr'
-        lang_name = u'Francais'
+        lang_name = 'Français'
     else:
         lang_code = 'en'
         lang_name = 'English'
@@ -111,3 +112,36 @@ def prepareOtherLang(req, currentLang, uri):
             lang_link = '%s?%s=%s' % (uri, paramName, lang_code)
 
     return (lang_name, lang_link)
+
+def mailPassword(request, template_name='mail_password.html'):
+    """
+    view class to handle user mail password request.
+    """
+
+    responseDict = {}
+
+    # preparing the other lanaguage
+    lang = get_language()
+    uri =  request.build_absolute_uri()
+    lang_name, lang_link = prepareOtherLang(request.REQUEST, lang, uri)
+    responseDict['lang_name'] = lang_name
+    responseDict['lang_link'] = lang_link
+
+    if request.method == 'POST':
+
+        userId = request.POST.get('userid', '')
+        if userId == '':
+            # not valid request.
+            responseDict['invalid_userid'] = 'userid is required'
+        else:
+            # send request to Plone and wait for response.
+            responseDict['confirm_mail_password'] = 'mail password confirm!'
+            # handle other errors.
+
+    return render_to_response(template_name,
+                              responseDict,
+                              context_instance=RequestContext(request))
+
+#def mailPlonePassword(userId):
+
+    

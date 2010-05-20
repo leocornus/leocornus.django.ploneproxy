@@ -1,5 +1,5 @@
 
-# tryhttplib2.py
+# httplib2-test.py
 
 """
 a small script try to use httplib2 to do backend login to a Plone site through

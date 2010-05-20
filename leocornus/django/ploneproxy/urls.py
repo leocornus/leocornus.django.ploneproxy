@@ -17,4 +17,5 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
     (r'^login/$', 'leocornus.django.ploneproxy.views.login')
+    (r'^mail_password/$', 'leocornus.django.ploneproxy.views.mailPassword')
 )
