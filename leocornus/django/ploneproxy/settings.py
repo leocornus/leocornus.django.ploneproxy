@@ -66,7 +66,7 @@ AUTHENTICATION_BACKENDS = (
 # setting for leocornus.django.ploneproxy
 PLONEPROXY_AUTHEN_URL = 'http://internal.host.name/Plone/login_form'
 PLONEPROXY_COOKIE_NAME = '__ac'
-PLONEPROXY_LANG_PARAM_NAME = 'ldp_lang'
+PLONEPROXY_LANG_FIELD_NAME = 'ldp_lang'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

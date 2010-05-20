@@ -49,7 +49,6 @@ def login(request, template_name='login.html',
     else:
         form = AuthenticationForm(request)
 
-    import pdb; pdb.set_trace()
     request.session.set_test_cookie()
     if Site._meta.installed:
         current_site = Site.objects.get_current()
@@ -82,15 +81,7 @@ def prepareOtherLang(req, currentLang, uri):
         lang_code = 'en'
         lang_name = 'English'
 
-    # get the language parameter name.
-    try:
-        paramName = settings.PLONEPROXY_LANG_PARAM_NAME
-        if not paramName:
-            # set to None, then we use default.
-            paramName = 'ldp_lang'
-    except AttributeError:
-        # using the default Plone cookie name.
-        paramName = 'ldp_lang'
+    paramName = settings.PLONEPROXY_LANG_FIELD_NAME
     langs = req.getlist(paramName)
 
     if len(langs) > 0:

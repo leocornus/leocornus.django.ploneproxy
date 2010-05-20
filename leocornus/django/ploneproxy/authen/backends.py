@@ -83,15 +83,7 @@ class PloneModelBackend(object):
             cookie = SimpleCookie()
             cookie.load(res['set-cookie'])
 
-            try:
-                cookieName = settings.PLONEPROXY_COOKIE_NAME
-                if not cookieName:
-                    # set to None, then we use default.
-                    cookieName = '__ac'
-            except AttributeError:
-                # using the default Plone cookie name.
-                cookieName = '__ac'
-
+            cookieName = settings.PLONEPROXY_COOKIE_NAME
             if cookie.has_key(cookieName):
 
                 cookieValue = cookie.get(cookieName).value

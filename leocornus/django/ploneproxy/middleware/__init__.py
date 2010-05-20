@@ -22,17 +22,9 @@ class LocaleMiddleware(object):
 
     def process_request(self, request):
 
-        try:
-            paramName = settings.PLONEPROXY_LANG_PARAM_NAME
-            if not paramName:
-                # set to None, then we use default.
-                paramName = 'ldp_lang'
-        except AttributeError:
-            # using the default Plone cookie name.
-            paramName = 'ldp_lang'
-
-        langParam = request.REQUEST.get(paramName, None)
-        if langParam:
+        langParam = request.REQUEST.get(settings.PLONEPROXY_LANG_FIELD_NAME,
+                                        '')
+        if langParam != '':
             language = langParam
         else:
             language = translation.get_language_from_request(request)
