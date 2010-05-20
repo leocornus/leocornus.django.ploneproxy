@@ -58,7 +58,7 @@ def login(request, template_name='login.html',
     # decide another available language.
     lang = get_language()
     uri =  request.build_absolute_uri()
-    lang_code, lang_name, lang_link = prepareOtherLang(request.REQUEST, lang, uri)
+    lang_name, lang_link = prepareOtherLang(request.REQUEST, lang, uri)
 
     return render_to_response(template_name, {
         'form' : form,
@@ -106,7 +106,7 @@ def prepareOtherLang(req, currentLang, uri):
         else:
             lang_link = '%s?%s' % (uri, newStr)
 
-    return (lang_code, lang_name, lang_link)
+    return (lang_name, lang_link)
 
 def mailPassword(request, template_name='mail_password.html'):
     """
