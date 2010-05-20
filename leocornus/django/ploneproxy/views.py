@@ -58,13 +58,14 @@ def login(request, template_name='login.html',
     # decide another available language.
     lang = get_language()
     uri =  request.build_absolute_uri()
-    lang_name, lang_link = prepareOtherLang(request.REQUEST, lang, uri)
+    lang_code, lang_name, lang_link = prepareOtherLang(request.REQUEST, lang, uri)
 
     return render_to_response(template_name, {
-        'form': form,
-        redirect_field_name: redirect_to,
-        'site': current_site,
-        'site_name': current_site.name,
+        'form' : form,
+        redirect_field_name : redirect_to,
+        settings.PLONEPROXY_LANG_FIELD_NAME : lang,
+        'site' : current_site,
+        'site_name' : current_site.name,
         'lang_name' : lang_name,
         'lang_link' : lang_link,
     }, context_instance=RequestContext(request))
@@ -84,25 +85,28 @@ def prepareOtherLang(req, currentLang, uri):
     paramName = settings.PLONEPROXY_LANG_FIELD_NAME
     langs = req.getlist(paramName)
 
+    # the new param
+    newStr = '%s=%s' % (paramName, lang_code)
     if len(langs) > 0:
-        # the current parameters.
-        current = ''
-        for lang in langs:
-            one = '%s=%s' % (paramName, lang)
-            if (langs.index(lang) + 1) < len(langs):
-                one = one + '&'
-            current = current + one
-        # the new param
-        newStr = '%s=%s' % (paramName, lang_code)
-        # replace!
-        lang_link = uri.replace(current, newStr)
+        if uri.find(u'?') > 0:
+            # the current parameters.
+            current = ''
+            for lang in langs:
+                one = '%s=%s' % (paramName, lang)
+                if (langs.index(lang) + 1) < len(langs):
+                    one = one + '&'
+                current = current + one
+            # replace!
+            lang_link = uri.replace(current, newStr)
+        else:
+            lang_link = '%s?%s' % (uri, newStr)
     else:
         if uri.find(u'?') > 0:
-            lang_link = '%s&%s=%s' % (uri, paramName, lang_code)
+            lang_link = '%s&%s' % (uri, newStr)
         else:
-            lang_link = '%s?%s=%s' % (uri, paramName, lang_code)
+            lang_link = '%s?%s' % (uri, newStr)
 
-    return (lang_name, lang_link)
+    return (lang_code, lang_name, lang_link)
 
 def mailPassword(request, template_name='mail_password.html'):
     """
