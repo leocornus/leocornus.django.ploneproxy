@@ -66,7 +66,8 @@ def login(request, template_name='login.html',
     # decide another available language.
     lang = get_language()
     uri =  request.build_absolute_uri()
-    lang_name, lang_link = prepareOtherLang(request.REQUEST, lang, uri)
+    lang_name, lang_link = prepareOtherLang(request.REQUEST, redirect_field_name,
+                                            lang, uri)
     resDict[settings.PLONEPROXY_LANG_FIELD_NAME] = lang
     resDict['lang_name'] = lang_name
     resDict['lang_link'] = lang_link
@@ -79,7 +80,7 @@ def login(request, template_name='login.html',
 
 login = never_cache(login)
 
-def prepareOtherLang(req, currentLang, uri):
+def prepareOtherLang(req, redirect_field, currentLang, uri):
 
     if currentLang == 'en':
         lang_code = 'fr'
@@ -111,6 +112,13 @@ def prepareOtherLang(req, currentLang, uri):
             lang_link = '%s&%s' % (uri, newStr)
         else:
             lang_link = '%s?%s' % (uri, newStr)
+
+    redirect_to = req.get(redirect_field, '')
+    if redirect_to != '':
+        if lang_link.find(redirect_to) < 0:
+            lang_link = '%s&%s=%s' % (lang_link,
+                                      redirect_field,
+                                      redirect_to)
 
     return (lang_name, lang_link)
 
