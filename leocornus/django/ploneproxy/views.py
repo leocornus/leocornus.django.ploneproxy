@@ -29,8 +29,7 @@ def login(request, template_name='login.html',
     """
 
     redirect_to = request.REQUEST.get(redirect_field_name, '')
-
-    accept = request.POST.get('accept_disclaimer', '')
+    resDict = {}
 
     if request.method == "POST":
         form = AuthenticationForm(data=request.POST)
@@ -42,10 +41,17 @@ def login(request, template_name='login.html',
             from django.contrib.auth import login
             login(request, form.get_user())
 
+            # looks like everything is fine now.
             if request.session.test_cookie_worked():
                 request.session.delete_test_cookie()
 
             return HttpResponseRedirect(redirect_to)
+        else:
+            # invalid form input!
+            if form.errors.has_key('__all__'):
+                resDict['invalid_cred'] = 'Please enter a correct username and password'
+            else:
+                resDict['invalid_fields'] = 'All fields must be filled in'
     else:
         form = AuthenticationForm(request)
 
@@ -54,24 +60,24 @@ def login(request, template_name='login.html',
         current_site = Site.objects.get_current()
     else:
         current_site = RequestSite(request)
+    resDict['site'] = current_site
+    resDict['site_name'] = current_site.name
 
     # decide another available language.
     lang = get_language()
     uri =  request.build_absolute_uri()
     lang_name, lang_link = prepareOtherLang(request.REQUEST, lang, uri)
+    resDict[settings.PLONEPROXY_LANG_FIELD_NAME] = lang
+    resDict['lang_name'] = lang_name
+    resDict['lang_link'] = lang_link
 
-    return render_to_response(template_name, {
-        'form' : form,
-        redirect_field_name : redirect_to,
-        settings.PLONEPROXY_LANG_FIELD_NAME : lang,
-        'site' : current_site,
-        'site_name' : current_site.name,
-        'lang_name' : lang_name,
-        'lang_link' : lang_link,
-    }, context_instance=RequestContext(request))
+    resDict['form'] = form
+    resDict[redirect_field_name] = redirect_to
+
+    return render_to_response(template_name, resDict,
+                              context_instance=RequestContext(request))
 
 login = never_cache(login)
-
 
 def prepareOtherLang(req, currentLang, uri):
 

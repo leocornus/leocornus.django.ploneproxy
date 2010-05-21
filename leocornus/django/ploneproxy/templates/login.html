@@ -3,11 +3,13 @@
 
 {% block content %}
 
-{% if form.errors_message %}
-<p>Your username and password didn't match. Please try again.</p>
+{% if invalid_fields %}
+  <p>{% trans 'All fields must be filled in' %}</p>
+{% endif %}
+{% if invalid_cred %}
+  <p>{% trans "Your username and password didn't match. Please try againa." %}</p>
 {% endif %}
 
-{{ form.errors }}
 
 <form method="post" action="{% url leocornus.django.ploneproxy.views.login %}">
 <table><tbody>
@@ -19,8 +21,7 @@
 </tr>
 <tr>
   <td>
-    <label for="id_username">Username:</label>
-    {{ form.username.errors }}
+    <label for="id_username">{% trans 'Username' %}:</label>
   </td>
   <td>
     {{ form.username }}
@@ -28,19 +29,10 @@
 </tr>
 <tr>
   <td>
-    <label for="id_password">Password:</label>
-    {{ form.password.errors }}
+    <label for="id_password">{% trans 'Password' %}:</label>
   </td>
   <td>
     {{ form.password }}
-  </td>
-</tr>
-<tr>
-  <td>
-    <input type="checkbox" name="accept_disclaimer"/>
-  </td>
-  <td>
-    {% trans 'Yes, I accept the disclaimer' %}
   </td>
 </tr>
 </tbody></table>
