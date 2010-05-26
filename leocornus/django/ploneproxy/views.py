@@ -5,6 +5,11 @@
 django view classes for leocornus.django.ploneproxy
 """
 
+import httplib2
+import urllib
+
+from django.core.urlresolvers import reverse
+
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
@@ -18,6 +23,8 @@ from django.template import RequestContext
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
+
+from leocornus.django.ploneproxy import LEOCORNUS_HTTP_AGENT_NAME
 
 __author__ = "Sean Chen"
 __email__ = "sean.chen@leocorn.com"
@@ -75,6 +82,11 @@ def login(request, template_name='login.html',
     resDict['form'] = form
     resDict[redirect_field_name] = redirect_to
 
+    # url for forgot password.
+    resDict['forgot_pw_url'] = prepareForgotPasswordURL(request.REQUEST,
+                                                        redirect_field_name,
+                                                        lang)
+
     return render_to_response(template_name, resDict,
                               context_instance=RequestContext(request))
 
@@ -122,35 +134,98 @@ def prepareOtherLang(req, redirect_field, currentLang, uri):
 
     return (lang_name, lang_link)
 
-def mailPassword(request, template_name='mail_password.html'):
+def prepareForgotPasswordURL(request, redirect_field, current_lang):
+
+    base_url = reverse('leocornus.django.ploneproxy.views.mailPassword')
+    url = '%s?%s=%s' % (base_url, settings.PLONEPROXY_LANG_FIELD_NAME,
+                        current_lang)
+
+    redirect_to = request.get(redirect_field, None)
+    if redirect_to:
+        url = '%s&%s=%s' % (url, redirect_field, redirect_to)
+
+    return url
+    
+
+def mailPassword(request, template_name='mail_password.html',
+                 redirect_field_name=REDIRECT_FIELD_NAME):
     """
     view class to handle user mail password request.
     """
 
     responseDict = {}
 
+    redirect_to = request.REQUEST.get(redirect_field_name, '')
+    responseDict[redirect_field_name] = redirect_to
+
+    userId = request.REQUEST.get('userid', '')
+    responseDict['userid'] = userId
+
     # preparing the other lanaguage
     lang = get_language()
     uri =  request.build_absolute_uri()
-    lang_name, lang_link = prepareOtherLang(request.REQUEST, lang, uri)
+    lang_name, lang_link = prepareOtherLang(request.REQUEST, redirect_field_name,
+                                            lang, uri)
+    responseDict[settings.PLONEPROXY_LANG_FIELD_NAME] = lang
     responseDict['lang_name'] = lang_name
     responseDict['lang_link'] = lang_link
 
     if request.method == 'POST':
 
-        userId = request.POST.get('userid', '')
         if userId == '':
             # not valid request.
-            responseDict['invalid_userid'] = 'userid is required'
-        else:
+            responseDict['error'] = 'we got error!'
+            responseDict['no_userid'] = 'userid is required'
+        elif redirect_to != '':
             # send request to Plone and wait for response.
-            responseDict['confirm_mail_password'] = 'mail password confirm!'
-            # handle other errors.
+            if mailPlonePassword(buildPloneMailpwURL(request, redirect_to),
+                                 userId):
+                responseDict['confirm_mail_password'] = 'mail password confirm!'
+            else:
+                # handle other errors.
+                responseDict['error'] = 'we got error!'
+                responseDict['invalid_userid'] = 'could not find user id!'
+        else:
+            responseDict['error'] = 'error'
+            responseDict['invalid_url'] = 'the url you provided is not valid!'
 
     return render_to_response(template_name,
                               responseDict,
                               context_instance=RequestContext(request))
 
-#def mailPlonePassword(userId):
+def mailPlonePassword(ploneMailpwURL, userId):
 
-    
+    http = httplib2.Http()
+
+    headers = {}
+    headers['Content-type'] = 'application/x-www-form-urlencoded'
+    headers['User-Agent'] = LEOCORNUS_HTTP_AGENT_NAME
+
+    mail_form = {}
+    mail_form['userid'] = userId
+
+    response, content = http.request(ploneMailpwURL, 'POST', headers=headers,
+                                     body=urllib.urlencode(mail_form))
+    # parse the response to decide it is success or not!
+    if response['status'] == '200':
+        if content.find('<form name="mail_password"') > 0:
+            # could not find user name
+            return False
+        else:
+            # everything should be fine now!
+            return True
+    else:
+        return False
+
+def buildPloneMailpwURL(request, redirect_to):
+
+    """
+    make Plone mail password url by adding mail_password at the end.
+    """
+
+    baseURL = '%s://%s' % (request.is_secure() and 'https' or 'http',
+                           request.get_host())
+    if redirect_to.endswith('/'):
+        return '%s%s%s' % (baseURL, redirect_to, 'mail_password')
+    else:
+        return '%s%s/%s' % (baseURL, redirect_to, 'mail_password')

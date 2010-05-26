@@ -14,6 +14,8 @@ from mod_python import apache
 from mod_python import util
 from mod_python import Cookie
 
+from leocornus.django.ploneproxy import LEOCORNUS_HTTP_AGENT_NAME
+
 __author__ = "Sean Chen"
 __email__ = "sean.chen@leocorn.com"
 
@@ -24,6 +26,10 @@ def authenhandler(request):
     """
 
     request.user = ''
+
+    if request.headers_in['User-Agent'] == LEOCORNUS_HTTP_AGENT_NAME and \
+       request.unparsed_uri.endswith('mail_password'):
+        return apache.OK
 
     if isValidSession(request):
         return apache.OK

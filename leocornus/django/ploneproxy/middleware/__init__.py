@@ -23,6 +23,7 @@ settings.PLONEPROXY_AUTHEN_URL = getattr(settings, 'PLONEPROXY_AUTHEN_URL',
 # the default language field name
 settings.PLONEPROXY_LANG_FIELD_NAME = getattr(settings, 'PLONEPROXY_LANG_FIELD_NAME',
                                               'ldp_lang')
+
 class LocaleMiddleware(object):
     """
     This middleware is copied from the default Django LocaleMiddleware.
