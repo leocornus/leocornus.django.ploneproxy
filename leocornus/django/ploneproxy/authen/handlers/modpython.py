@@ -7,6 +7,8 @@ on mod_python to be install in your Python environment.
 """
 
 import os
+import re
+
 from datetime import datetime
 from datetime import timedelta
 
@@ -27,8 +29,17 @@ def authenhandler(request):
 
     request.user = ''
 
-    if request.headers_in['User-Agent'] == LEOCORNUS_HTTP_AGENT_NAME and \
-       request.unparsed_uri.endswith('mail_password'):
+    if isGreenRequest(request):
+        return apache.OK
+
+    pwreset = checkPasswordresetRequest(request)
+    if len(pwreset) > 0:
+        options = request.get_options()
+        pwreset_url = options.get('PLONEPROXY_PWRESET_URL', '/ext/password_reset')
+        # we will use the default Django REDIRECT_FIELD_NAME: next
+        util.redirect(request, "%s?next=%s&token=%s" % (pwreset_url,
+                                                        pwreset[0][0],
+                                                        pwreset[0][1]))
         return apache.OK
 
     if isValidSession(request):
@@ -41,6 +52,35 @@ def authenhandler(request):
         # we will use the default Django REDIRECT_FIELD_NAME: next
         util.redirect(request, "%s?next=%s" % (login_url, request.unparsed_uri))
         return apache.HTTP_UNAUTHORIZED
+
+def isGreenRequest(req):
+    """
+    green request will be pass through without authentication, there are only
+    2 green requests now: mail_password and pwrest_form
+    """
+
+    if not (req.unparsed_uri.endswith('mail_password') or \
+            req.unparsed_uri.endswith('pwreset_form')):
+        # not qualified.
+        return False
+
+    if req.headers_in['User-Agent'] != LEOCORNUS_HTTP_AGENT_NAME:
+        return False
+
+    if req.connection.local_ip != req.connection.remote_ip:
+        # make sure the request is sent from local machine.
+        return False
+
+    # everything looks fine now!
+    return True
+
+def checkPasswordresetRequest(req):
+    """
+    it is quiet easy for now.
+    """
+
+    return re.findall(r'(.*)/passwordreset/([0-9a-zA-Z]{32})$',
+                      req.unparsed_uri)
 
 def isValidSession(req):
     """
