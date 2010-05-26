@@ -72,9 +72,7 @@ def login(request, template_name='login.html',
 
     # decide another available language.
     lang = get_language()
-    uri =  request.build_absolute_uri()
-    lang_name, lang_link = prepareOtherLang(request.REQUEST, redirect_field_name,
-                                            lang, uri)
+    lang_name, lang_link = prepareOtherLang(request, redirect_field_name, lang)
     resDict[settings.PLONEPROXY_LANG_FIELD_NAME] = lang
     resDict['lang_name'] = lang_name
     resDict['lang_link'] = lang_link
@@ -92,7 +90,7 @@ def login(request, template_name='login.html',
 
 login = never_cache(login)
 
-def prepareOtherLang(req, redirect_field, currentLang, uri):
+def prepareOtherLang(request, redirect_field, currentLang):
 
     if currentLang == 'en':
         lang_code = 'fr'
@@ -101,36 +99,16 @@ def prepareOtherLang(req, redirect_field, currentLang, uri):
         lang_code = 'en'
         lang_name = 'English'
 
+    redirect_to = request.REQUEST.get(redirect_field, '')
+
     paramName = settings.PLONEPROXY_LANG_FIELD_NAME
-    langs = req.getlist(paramName)
 
     # the new param
-    newStr = '%s=%s' % (paramName, lang_code)
-    if len(langs) > 0:
-        if uri.find(u'?') > 0:
-            # the current parameters.
-            current = ''
-            for lang in langs:
-                one = '%s=%s' % (paramName, lang)
-                if (langs.index(lang) + 1) < len(langs):
-                    one = one + '&'
-                current = current + one
-            # replace!
-            lang_link = uri.replace(current, newStr)
-        else:
-            lang_link = '%s?%s' % (uri, newStr)
-    else:
-        if uri.find(u'?') > 0:
-            lang_link = '%s&%s' % (uri, newStr)
-        else:
-            lang_link = '%s?%s' % (uri, newStr)
-
-    redirect_to = req.get(redirect_field, '')
+    newLang = '%s=%s' % (paramName, lang_code)
+    lang_link = '%s?%s' % (request.path, newLang)
     if redirect_to != '':
-        if lang_link.find(redirect_to) < 0:
-            lang_link = '%s&%s=%s' % (lang_link,
-                                      redirect_field,
-                                      redirect_to)
+        lang_link = '%s&%s=%s' % (lang_link,
+                                  redirect_field, redirect_to)
 
     return (lang_name, lang_link)
 
@@ -163,9 +141,7 @@ def mailPassword(request, template_name='mail_password.html',
 
     # preparing the other lanaguage
     lang = get_language()
-    uri =  request.build_absolute_uri()
-    lang_name, lang_link = prepareOtherLang(request.REQUEST, redirect_field_name,
-                                            lang, uri)
+    lang_name, lang_link = prepareOtherLang(request, redirect_field_name, lang)
     responseDict[settings.PLONEPROXY_LANG_FIELD_NAME] = lang
     responseDict['lang_name'] = lang_name
     responseDict['lang_link'] = lang_link
