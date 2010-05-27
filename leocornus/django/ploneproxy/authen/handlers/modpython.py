@@ -16,7 +16,8 @@ from mod_python import apache
 from mod_python import util
 from mod_python import Cookie
 
-from leocornus.django.ploneproxy.utils import LEOCORNUS_HTTP_AGENT_NAME
+from leocornus.django.ploneproxy.utils import LEOCORNUS_HTTP_HEADER_KEY
+from leocornus.django.ploneproxy.utils import LEOCORNUS_HTTP_HEADER_VALUE
 from leocornus.django.ploneproxy.utils import PLONEPROXY_REDIRECT_FIELD_NAME
 from leocornus.django.ploneproxy.utils import PLONEPROXY_TOKEN_FIELD_NAME
 from leocornus.django.ploneproxy.utils import PLONE_MAIL_PASSWORD_FORM
@@ -72,7 +73,7 @@ def isGreenRequest(req):
         # not qualified.
         return False
 
-    if req.headers_in['User-Agent'] != LEOCORNUS_HTTP_AGENT_NAME:
+    if req.headers_in[LEOCORNUS_HTTP_HEADER_KEY] != LEOCORNUS_HTTP_HEADER_VALUE:
         return False
 
     if req.connection.local_ip != req.connection.remote_ip:

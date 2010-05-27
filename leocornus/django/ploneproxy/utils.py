@@ -14,7 +14,8 @@ from django.core.urlresolvers import reverse
 __author__ = "Sean Chen"
 __email__ = "sean.chen@leocorn.com"
 
-LEOCORNUS_HTTP_AGENT_NAME = 'Leocornus Django PloneProxy (httplib2 Agent)'
+LEOCORNUS_HTTP_HEADER_KEY = 'Leocornus-Header'
+LEOCORNUS_HTTP_HEADER_VALUE = 'Leocornus Django PloneProxy (httplib2)'
 PLONEPROXY_REDIRECT_FIELD_NAME = 'next'
 PLONEPROXY_TOKEN_FIELD_NAME = 'token'
 
@@ -79,7 +80,7 @@ def mailPlonePassword(request, redirect_to, userId):
 
     headers = {}
     headers['Content-type'] = 'application/x-www-form-urlencoded'
-    headers['User-Agent'] = LEOCORNUS_HTTP_AGENT_NAME
+    headers[LEOCORNUS_HTTP_HEADER_KEY] = LEOCORNUS_HTTP_HEADER_VALUE
 
     mail_form = {}
     mail_form['userid'] = userId
@@ -121,7 +122,7 @@ def resetPlonePassword(request, redirect_to, token, userId, newPassword):
 
     headers = {}
     headers['Content-type'] = 'application/x-www-form-urlencoded'
-    headers['User-Agent'] = LEOCORNUS_HTTP_AGENT_NAME
+    headers[LEOCORNUS_HTTP_HEADER_KEY] = LEOCORNUS_HTTP_HEADER_VALUE
 
     pwreset_form = {}
     pwreset_form['randomstring'] = token
