@@ -13,6 +13,8 @@ from django.db import connection
 from django.contrib.auth.models import User
 from django.conf import settings
 
+from leocornus.django.ploneproxy.utils import LEOCORNUS_HTTP_HEADER_KEY
+from leocornus.django.ploneproxy.utils import LEOCORNUS_HTTP_HEADER_VALUE
 from leocornus.django.ploneproxy.authen.models import PloneAuthenState
 
 __author__ = "Sean Chen"

@@ -8,7 +8,7 @@ django view classes for leocornus.django.ploneproxy
 import httplib2
 
 from django.conf import settings
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate
 
 from django.shortcuts import render_to_response
 from django.contrib.sites.models import Site
@@ -39,30 +39,35 @@ def login(request, template_name='login.html',
 
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     resDict = {}
+    
 
     if request.method == "POST":
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            # Light security check -- make sure redirect_to isn't garbage.
-            if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
-                redirect_to = settings.LOGIN_REDIRECT_URL
-            
-            from django.contrib.auth import login
-            login(request, form.get_user())
 
-            # looks like everything is fine now.
-            if request.session.test_cookie_worked():
-                request.session.delete_test_cookie()
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
 
-            return HttpResponseRedirect(redirect_to)
+        # keep user name.
+        resDict['username'] = username
+
+        # Light security check -- make sure redirect_to isn't garbage.
+        if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
+            resDict['invalid_url'] = 'Invalid URL! Please double check your url!'
+        elif username == '' or password == '':
+            # all fields are required!
+            resDict['invalid_fields'] = 'All fields must be filled in'
         else:
-            # invalid form input!
-            if form.errors.has_key('__all__'):
+            #loginurl = buildPloneLoginURL(request, redirect_to)
+            user = authenticate(username=username, password=password)
+            if user is None:
                 resDict['invalid_cred'] = 'Please enter a correct username and password'
             else:
-                resDict['invalid_fields'] = 'All fields must be filled in'
-    else:
-        form = AuthenticationForm(request)
+                from django.contrib.auth import login
+                login(request, user)
+
+                # looks like everything is fine now.
+                if request.session.test_cookie_worked():
+                    request.session.delete_test_cookie()
+                    return HttpResponseRedirect(redirect_to)
 
     request.session.set_test_cookie()
     if Site._meta.installed:
@@ -79,7 +84,6 @@ def login(request, template_name='login.html',
     resDict['lang_name'] = lang_name
     resDict['lang_link'] = lang_link
 
-    resDict['form'] = form
     resDict[redirect_field_name] = redirect_to
 
     # url for forgot password.
