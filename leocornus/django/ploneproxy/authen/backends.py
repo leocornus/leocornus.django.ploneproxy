@@ -27,9 +27,9 @@ class PloneModelBackend(object):
 
     # TODO: Model, login attribute name and password attribute name should be
     # configurable.
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, username=None, password=None, loginurl=None):
 
-        ploneCookie = self.authPloneUser(username, password)
+        ploneCookie = self.authPloneUser(username, password, loginurl)
         if ploneCookie:
             cookieName, cookieValue = ploneCookie
             try:
@@ -56,11 +56,9 @@ class PloneModelBackend(object):
             # not valid plone user
             return None
 
-    def authPloneUser(self, username, password):
+    def authPloneUser(self, username, password, loginurl):
 
         http = httplib2.Http()
-
-        login_url = settings.PLONEPROXY_AUTHEN_URL
 
         headers = {}
         headers['Content-type'] = 'application/x-www-form-urlencoded'
@@ -76,7 +74,7 @@ class PloneModelBackend(object):
         body = urllib.urlencode(login_form)
 
         try:
-            res, cont = http.request(login_url, 'POST',
+            res, cont = http.request(loginurl, 'POST',
                                      headers=headers, body=body)
         except Exception:
             # not valid login url!
@@ -87,10 +85,15 @@ class PloneModelBackend(object):
             cookie.load(res['set-cookie'])
 
             cookieName = settings.PLONEPROXY_COOKIE_NAME
+            defaultCookieName = '__ac'
             if cookie.has_key(cookieName):
 
                 cookieValue = cookie.get(cookieName).value
                 return (cookieName, cookieValue)
+            elif cookie.has_key(defaultCookieName):
+                # try the default Plone cookie name in case.
+                cookieValue = cookie.get(defaultCookieName).value
+                return (defaultCookieName, cookieValue)
 
         # no valid cookie found!
         return None

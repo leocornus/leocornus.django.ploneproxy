@@ -19,6 +19,7 @@ LEOCORNUS_HTTP_HEADER_VALUE = 'Leocornus Django PloneProxy (httplib2)'
 PLONEPROXY_REDIRECT_FIELD_NAME = 'next'
 PLONEPROXY_TOKEN_FIELD_NAME = 'token'
 
+PLONE_LOGIN_FORM = 'login_form'
 PLONE_MAIL_PASSWORD_FORM = 'mail_password'
 PLONE_PASSWORD_RESET_FORM = 'pwreset_form'
 PLONE_PASSWORD_RESET_FINISH = 'pwreset_finish'
@@ -27,6 +28,14 @@ def getBaseURL(request):
 
     return '%s://%s' % (request.is_secure() and 'https' or 'http',
                         request.get_host())
+
+def buildPloneLoginURL(request, redirect_to):
+
+    baseURL = getBaseURL(request)
+    if redirect_to.endswith('/'):
+        return '%s%s%s' % (baseURL, redirect_to, PLONE_LOGIN_FORM)
+    else:
+        return '%s%s/%s' % (baseURL, redirect_to, PLONE_LOGIN_FORM)
 
 def prepareOtherLang(request, redirectField, currentLang, tokenField=None):
 

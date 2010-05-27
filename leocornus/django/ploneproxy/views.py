@@ -23,6 +23,7 @@ from django.views.decorators.cache import never_cache
 from utils import PLONEPROXY_REDIRECT_FIELD_NAME
 from utils import PLONEPROXY_TOKEN_FIELD_NAME
 from utils import getBaseURL
+from utils import buildPloneLoginURL
 from utils import prepareOtherLang
 from utils import prepareForgotPasswordURL
 from utils import mailPlonePassword
@@ -56,8 +57,9 @@ def login(request, template_name='login.html',
             # all fields are required!
             resDict['invalid_fields'] = 'All fields must be filled in'
         else:
-            #loginurl = buildPloneLoginURL(request, redirect_to)
-            user = authenticate(username=username, password=password)
+            loginurl = buildPloneLoginURL(request, redirect_to)
+            user = authenticate(username=username, password=password,
+                                loginurl=loginurl)
             if user is None:
                 resDict['invalid_cred'] = 'Please enter a correct username and password'
             else:

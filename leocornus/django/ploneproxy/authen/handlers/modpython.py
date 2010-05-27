@@ -20,6 +20,7 @@ from leocornus.django.ploneproxy.utils import LEOCORNUS_HTTP_HEADER_KEY
 from leocornus.django.ploneproxy.utils import LEOCORNUS_HTTP_HEADER_VALUE
 from leocornus.django.ploneproxy.utils import PLONEPROXY_REDIRECT_FIELD_NAME
 from leocornus.django.ploneproxy.utils import PLONEPROXY_TOKEN_FIELD_NAME
+from leocornus.django.ploneproxy.utils import PLONE_LOGIN_FORM
 from leocornus.django.ploneproxy.utils import PLONE_MAIL_PASSWORD_FORM
 from leocornus.django.ploneproxy.utils import PLONE_PASSWORD_RESET_FORM
 
@@ -68,7 +69,8 @@ def isGreenRequest(req):
     2 green requests now: mail_password and pwrest_form
     """
 
-    if not (req.unparsed_uri.endswith(PLONE_MAIL_PASSWORD_FORM) or \
+    if not (req.unparsed_uri.endswith(PLONE_LOGIN_FORM) or \
+            req.unparsed_uri.endswith(PLONE_MAIL_PASSWORD_FORM) or \
             req.unparsed_uri.endswith(PLONE_PASSWORD_RESET_FORM)):
         # not qualified.
         return False
