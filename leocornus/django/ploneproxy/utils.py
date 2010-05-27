@@ -31,11 +31,21 @@ def getBaseURL(request):
 
 def buildPloneLoginURL(request, redirect_to):
 
+    return buildPloneURL(request, redirect_to, PLONE_LOGIN_FORM)
+
+def buildPloneURL(request, redirect_to, form):
+
     baseURL = getBaseURL(request)
-    if redirect_to.endswith('/'):
-        return '%s%s%s' % (baseURL, redirect_to, PLONE_LOGIN_FORM)
-    else:
-        return '%s%s/%s' % (baseURL, redirect_to, PLONE_LOGIN_FORM)
+    path = redirect_to
+    if not redirect_to.endswith('/'):
+        path = '%s/' % redirect_to
+    # bypass some
+    views = ['/view/', '/presentation_view/', '/folder_contents/']
+    for view in views:
+        if path.endswith(view):
+            path = path.rsplit(view, 1)[0] + '/'
+
+    return '%s%s%s' % (baseURL, path, form)
 
 def prepareOtherLang(request, redirectField, currentLang, tokenField=None):
 
@@ -113,11 +123,7 @@ def buildPloneMailpwURL(request, redirect_to):
     make Plone mail password url by adding mail_password at the end.
     """
 
-    baseURL = getBaseURL(request)
-    if redirect_to.endswith('/'):
-        return '%s%s%s' % (baseURL, redirect_to, PLONE_MAIL_PASSWORD_FORM)
-    else:
-        return '%s%s/%s' % (baseURL, redirect_to, PLONE_MAIL_PASSWORD_FORM)
+    return buildPloneURL(request, redirect_to, PLONE_MAIL_PASSWORD_FORM)
 
 def resetPlonePassword(request, redirect_to, token, userId, newPassword):
     """
@@ -152,8 +158,4 @@ def resetPlonePassword(request, redirect_to, token, userId, newPassword):
 
 def buildPlonePwresetURL(request, redirect_to):
 
-    baseURL = getBaseURL(request)
-    if redirect_to.endswith('/'):
-        return '%s%s%s' % (baseURL, redirect_to, PLONE_PASSWORD_RESET_FORM)
-    else:
-        return '%s%s/%s' % (baseURL, redirect_to, PLONE_PASSWORD_RESET_FORM)
+    return buildPloneURL(request, redirect_to, PLONE_PASSWORD_RESET_FORM)

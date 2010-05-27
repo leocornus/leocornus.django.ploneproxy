@@ -75,6 +75,9 @@ def isGreenRequest(req):
         # not qualified.
         return False
 
+    if not req.headers_in.has_key(LEOCORNUS_HTTP_HEADER_KEY):
+        return False
+
     if req.headers_in[LEOCORNUS_HTTP_HEADER_KEY] != LEOCORNUS_HTTP_HEADER_VALUE:
         return False
 
