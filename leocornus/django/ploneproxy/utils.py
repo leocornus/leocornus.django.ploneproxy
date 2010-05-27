@@ -40,8 +40,7 @@ def buildPloneURL(request, redirect_to, form):
     if not redirect_to.endswith('/'):
         path = '%s/' % redirect_to
     # bypass some
-    views = ['/view/', '/presentation_view/', '/folder_contents/']
-    for view in views:
+    for view in settings.PLONEPROXY_PLONE_VIEW_BYPASS:
         if path.endswith(view):
             path = path.rsplit(view, 1)[0] + '/'
 
