@@ -8,7 +8,6 @@ django view classes for leocornus.django.ploneproxy
 import httplib2
 
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.shortcuts import render_to_response
@@ -21,17 +20,19 @@ from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 
-from leocornus.django.ploneproxy import LEOCORNUS_HTTP_AGENT_NAME
+from utils import PLONEPROXY_REDIRECT_FIELD_NAME
+from utils import PLONEPROXY_TOKEN_FIELD_NAME
+from utils import getBaseURL
 from utils import prepareOtherLang
 from utils import prepareForgotPasswordURL
 from utils import mailPlonePassword
-from utils import buildPloneMailpwURL
+from utils import resetPlonePassword
 
 __author__ = "Sean Chen"
 __email__ = "sean.chen@leocorn.com"
 
 def login(request, template_name='login.html',
-          redirect_field_name=REDIRECT_FIELD_NAME):
+          redirect_field_name=PLONEPROXY_REDIRECT_FIELD_NAME):
     """
     Displays the login form and handles the login action.
     """
@@ -92,7 +93,7 @@ def login(request, template_name='login.html',
 login = never_cache(login)
 
 def mailPassword(request, template_name='mail_password.html',
-                 redirect_field_name=REDIRECT_FIELD_NAME):
+                 redirect_field_name=PLONEPROXY_REDIRECT_FIELD_NAME):
     """
     view class to handle user mail password request.
     """
@@ -120,8 +121,7 @@ def mailPassword(request, template_name='mail_password.html',
             responseDict['no_userid'] = 'userid is required'
         elif redirect_to != '':
             # send request to Plone and wait for response.
-            if mailPlonePassword(buildPloneMailpwURL(request, redirect_to),
-                                 userId):
+            if mailPlonePassword(request, redirect_to, userId):
                 responseDict['confirm_mail_password'] = 'mail password confirm!'
             else:
                 # handle other errors.
@@ -131,6 +131,64 @@ def mailPassword(request, template_name='mail_password.html',
             responseDict['error'] = 'error'
             responseDict['invalid_url'] = 'the url you provided is not valid!'
 
-    return render_to_response(template_name,
-                              responseDict,
+    return render_to_response(template_name, responseDict,
+                              context_instance=RequestContext(request))
+
+def passwordReset(request, template_name='password_reset.html',
+                  redirect_field_name=PLONEPROXY_REDIRECT_FIELD_NAME):
+    """
+    view class for user to reset password.
+    """
+
+    responseDict = {}
+
+    redirect_to = request.REQUEST.get(redirect_field_name, '')
+    responseDict[redirect_field_name] = redirect_to
+
+    userId = request.REQUEST.get('userid', '')
+    responseDict['userid'] = userId
+    token = request.REQUEST.get(PLONEPROXY_TOKEN_FIELD_NAME, '')
+    responseDict[PLONEPROXY_TOKEN_FIELD_NAME] = token
+
+    # preparing the other lanaguage
+    lang = get_language()
+    lang_name, lang_link = prepareOtherLang(request, redirect_field_name,
+                                            lang, PLONEPROXY_TOKEN_FIELD_NAME)
+    responseDict[settings.PLONEPROXY_LANG_FIELD_NAME] = lang
+    responseDict['lang_name'] = lang_name
+    responseDict['lang_link'] = lang_link
+
+    if request.method == 'POST':
+
+        password1 = request.POST.get('password1', '')
+        password2 = request.POST.get('password2', '')
+
+        if token == '' or redirect_to == '':
+            # not valid url.
+            responseDict['error'] = 'error'
+            responseDict['invalid_url'] = 'the url you provided is not valid!'
+        elif userId == '':
+            # not valid request.
+            responseDict['error'] = 'we got error!'
+            responseDict['no_userid'] = 'userid is required'
+        elif password1 == '' or password2 == '':
+            responseDict['error'] = 'we got error!'
+            responseDict['no_password'] = 'both passwords are required'
+        elif password1 != password2:
+            responseDict['error'] = 'we got error!'
+            responseDict['password_no_match'] = 'password not match!'
+        else:
+            # everything is fine now!
+            # send request to Plone and wait for response.
+            if resetPlonePassword(request, redirect_to, token, userId,
+                                  password1):
+                responseDict['confirm_password_reset'] = 'password success!'
+                responseDict['redirect_link'] = '%s%s' % (getBaseURL(request),
+                                                          redirect_to)
+            else:
+                # handle other errors.
+                responseDict['error'] = 'we got error!'
+                responseDict['password_reset_fail'] = 'reset password fail!'
+
+    return render_to_response(template_name, responseDict,
                               context_instance=RequestContext(request))

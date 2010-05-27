@@ -16,7 +16,11 @@ from mod_python import apache
 from mod_python import util
 from mod_python import Cookie
 
-from leocornus.django.ploneproxy import LEOCORNUS_HTTP_AGENT_NAME
+from leocornus.django.ploneproxy.utils import LEOCORNUS_HTTP_AGENT_NAME
+from leocornus.django.ploneproxy.utils import PLONEPROXY_REDIRECT_FIELD_NAME
+from leocornus.django.ploneproxy.utils import PLONEPROXY_TOKEN_FIELD_NAME
+from leocornus.django.ploneproxy.utils import PLONE_MAIL_PASSWORD_FORM
+from leocornus.django.ploneproxy.utils import PLONE_PASSWORD_RESET_FORM
 
 __author__ = "Sean Chen"
 __email__ = "sean.chen@leocorn.com"
@@ -35,11 +39,13 @@ def authenhandler(request):
     pwreset = checkPasswordresetRequest(request)
     if len(pwreset) > 0:
         options = request.get_options()
-        pwreset_url = options.get('PLONEPROXY_PWRESET_URL', '/ext/password_reset')
+        pwreset_url = options.get('PLONEPROXY_PWRESET_URL',
+                                  '/ext/password_reset')
         # we will use the default Django REDIRECT_FIELD_NAME: next
-        util.redirect(request, "%s?next=%s&token=%s" % (pwreset_url,
-                                                        pwreset[0][0],
-                                                        pwreset[0][1]))
+        util.redirect(request, "%s?%s=%s&%s=%s" % \
+                      (pwreset_url,
+                       PLONEPROXY_REDIRECT_FIELD_NAME, pwreset[0][0],
+                       PLONEPROXY_TOKEN_FIELD_NAME, pwreset[0][1]))
         return apache.OK
 
     if isValidSession(request):
@@ -50,7 +56,9 @@ def authenhandler(request):
         options = request.get_options()
         login_url = options.get('PLONEPROXY_LOGIN_URL', '/ext/login')
         # we will use the default Django REDIRECT_FIELD_NAME: next
-        util.redirect(request, "%s?next=%s" % (login_url, request.unparsed_uri))
+        util.redirect(request, "%s?%s=%s" % \
+                      (login_url,
+                       PLONEPROXY_REDIRECT_FIELD_NAME, request.unparsed_uri))
         return apache.HTTP_UNAUTHORIZED
 
 def isGreenRequest(req):
@@ -59,8 +67,8 @@ def isGreenRequest(req):
     2 green requests now: mail_password and pwrest_form
     """
 
-    if not (req.unparsed_uri.endswith('mail_password') or \
-            req.unparsed_uri.endswith('pwreset_form')):
+    if not (req.unparsed_uri.endswith(PLONE_MAIL_PASSWORD_FORM) or \
+            req.unparsed_uri.endswith(PLONE_PASSWORD_RESET_FORM)):
         # not qualified.
         return False
 
