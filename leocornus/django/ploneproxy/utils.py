@@ -19,6 +19,7 @@ LEOCORNUS_HTTP_HEADER_VALUE = 'Leocornus Django PloneProxy (httplib2)'
 PLONEPROXY_REDIRECT_FIELD_NAME = 'next'
 PLONEPROXY_TOKEN_FIELD_NAME = 'token'
 
+PLONE_LOGOUT = 'logout'
 PLONE_LOGIN_FORM = 'login_form'
 PLONE_MAIL_PASSWORD_FORM = 'mail_password'
 PLONE_PASSWORD_RESET_FORM = 'pwreset_form'

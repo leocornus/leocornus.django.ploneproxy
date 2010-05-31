@@ -99,6 +99,22 @@ def login(request, template_name='login.html',
 
 login = never_cache(login)
 
+def logout(request, template_name='logout.html'):
+
+    resDict = {}
+
+    # decide another available language.
+    lang = get_language()
+    lang_name, lang_link = prepareOtherLang(request, 'fake', lang)
+    resDict['lang_name'] = lang_name
+    resDict['lang_link'] = lang_link
+
+    from django.contrib.auth.views import logout
+    logout(request)
+
+    return render_to_response(template_name, resDict,
+                              context_instance=RequestContext(request))
+
 def mailPassword(request, template_name='mail_password.html',
                  redirect_field_name=PLONEPROXY_REDIRECT_FIELD_NAME):
     """

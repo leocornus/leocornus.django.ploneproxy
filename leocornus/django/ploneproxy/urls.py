@@ -18,5 +18,6 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^login/$', 'leocornus.django.ploneproxy.views.login'),
     (r'^mail_password/$', 'leocornus.django.ploneproxy.views.mailPassword'),
-    (r'^password_reset/$', 'leocornus.django.ploneproxy.views.passwordReset')
+    (r'^password_reset/$', 'leocornus.django.ploneproxy.views.passwordReset'),
+    (r'^logout/$', 'leocornus.django.ploneproxy.views.logout')
 )

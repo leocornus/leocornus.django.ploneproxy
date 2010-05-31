@@ -23,6 +23,7 @@ from leocornus.django.ploneproxy.utils import PLONEPROXY_TOKEN_FIELD_NAME
 from leocornus.django.ploneproxy.utils import PLONE_LOGIN_FORM
 from leocornus.django.ploneproxy.utils import PLONE_MAIL_PASSWORD_FORM
 from leocornus.django.ploneproxy.utils import PLONE_PASSWORD_RESET_FORM
+from leocornus.django.ploneproxy.utils import PLONE_LOGOUT
 
 __author__ = "Sean Chen"
 __email__ = "sean.chen@leocorn.com"
@@ -34,13 +35,19 @@ def authenhandler(request):
     """
 
     request.user = ''
+    options = request.get_options()
+
+    if request.unparsed_uri.endswith(PLONE_LOGOUT):
+        # logout request.
+        logout_url = options.get('PLONEPROXY_LOGOUT_URL', '/ext/logout')
+        util.redirect(request, logout_url)
+        return apache.OK
 
     if isGreenRequest(request):
         return apache.OK
 
     pwreset = checkPasswordresetRequest(request)
     if len(pwreset) > 0:
-        options = request.get_options()
         pwreset_url = options.get('PLONEPROXY_PWRESET_URL',
                                   '/ext/password_reset')
         # we will use the default Django REDIRECT_FIELD_NAME: next
@@ -55,7 +62,6 @@ def authenhandler(request):
     else:
         # introduce a Python option for the login url, so we could configure
         # it in httpd.conf, PythonOption or SetEnv
-        options = request.get_options()
         login_url = options.get('PLONEPROXY_LOGIN_URL', '/ext/login')
         # we will use the default Django REDIRECT_FIELD_NAME: next
         util.redirect(request, "%s?%s=%s" % \

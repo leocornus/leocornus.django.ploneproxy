@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<table><tbody>
+<tr>
+  <td colspan="2">
+    <a href="{{ lang_link }}">{{ lang_name }}</a>
+  </td>
+</tr>
+<tr>
+  <td>
+    {% trans 'log out message' %}
+  </td>
+</tr>
+</tbody></table>
+
+
+{% endblock %}
