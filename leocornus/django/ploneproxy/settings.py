@@ -67,7 +67,9 @@ AUTHENTICATION_BACKENDS = (
 PLONEPROXY_COOKIE_NAME = '__ac'
 PLONEPROXY_LANG_FIELD_NAME = 'ldp_lang'
 PLONEPROXY_PLONE_VIEW_BYPASS = (
-    '/view/', '/presentation_view/', '/folder_contents/'
+    '/view/', '/presentation_view/', '/folder_contents/',
+    '/vcs_view/', '/ics_view/', '/manage_main/',
+    'plone_control_panel'
 )
 
 # List of callables that know how to import templates from various sources.

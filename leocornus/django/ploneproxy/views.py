@@ -69,7 +69,8 @@ def login(request, template_name='login.html',
                 # looks like everything is fine now.
                 if request.session.test_cookie_worked():
                     request.session.delete_test_cookie()
-                    return HttpResponseRedirect(redirect_to)
+
+                return HttpResponseRedirect(redirect_to)
 
     request.session.set_test_cookie()
     if Site._meta.installed:

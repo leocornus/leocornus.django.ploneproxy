@@ -22,7 +22,9 @@ settings.PLONEPROXY_LANG_FIELD_NAME = getattr(settings, 'PLONEPROXY_LANG_FIELD_N
 
 settings.PLONEPROXY_PLONE_VIEW_BYPASS = getattr(settings, 'PLONEPROXY_PLONE_VIEW_BYPASS',
                                                 ('/view/', '/presentation_view/',
-                                                 '/folder_contents/'))
+                                                 '/folder_contents/', '/vcs_view/',
+                                                 '/ics_view/', '/plone_control_panel/',
+                                                 'manage_main'))
 
 class LocaleMiddleware(object):
     """
