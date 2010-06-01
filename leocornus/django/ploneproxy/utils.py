@@ -73,9 +73,13 @@ def prepareOtherLang(request, redirectField, currentLang, tokenField=None):
 
     return (lang_name, lang_link)
 
-def prepareForgotPasswordURL(request, redirect_field, current_lang):
+def prepareForgotPasswordURL(request, redirect_field, current_lang,
+                             view='leocornus.django.ploneproxy.views.mailPassword'):
+    """
+    build the URL based on the request and view class name.
+    """
 
-    base_url = reverse('leocornus.django.ploneproxy.views.mailPassword')
+    base_url = reverse(view)
     url = '%s?%s=%s' % (base_url, settings.PLONEPROXY_LANG_FIELD_NAME,
                         current_lang)
 
