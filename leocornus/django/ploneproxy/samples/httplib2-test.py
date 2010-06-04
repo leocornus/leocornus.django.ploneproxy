@@ -20,6 +20,7 @@ login_url = 'http://internal.host.name/Plone/login_form'
 headers = {}
 headers['Content-type'] = 'application/x-www-form-urlencoded'
 headers['User-Agent'] = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+headers['Leocornus-Header'] = 'Leocornus Django PloneProxy (httplib2)'
 
 login_form = {}
 login_form['__ac_name'] = 'username'
