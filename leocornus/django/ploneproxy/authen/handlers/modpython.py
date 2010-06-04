@@ -148,6 +148,9 @@ def isValidSession(req):
             return False
 
         if session.expire_date > datetime.now():
+            if isResourcesRequest(req):
+                # just pass
+                return True
             # this is a valid session, update the expre date!
             expiry = settings.SESSION_COOKIE_AGE
             session.expire_date = datetime.now() + timedelta(seconds=expiry)
@@ -157,3 +160,20 @@ def isValidSession(req):
             return False
     finally:
         db.connection.close()
+
+def isResourcesRequest(req):
+    """
+    session less means not need update expire date.
+    """
+
+    if not (req.unparsed_uri.endswith('css') or \
+            req.unparsed_uri.endswith('js') or \
+            req.unparsed_uri.endswith('kss') or \
+            req.unparsed_uri.endswith('gif') or \
+            req.unparsed_uri.endswith('jpg') or \
+            req.unparsed_uri.endswith('png')):
+        # not qualified.
+        return True
+
+    # everything looks fine now!
+    return True
