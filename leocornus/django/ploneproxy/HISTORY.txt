@@ -1,3 +1,19 @@
 
 Change Logs
 ===========
+
+0.1beta2
+--------
+
+  * User can login to multiple Plone sites through a Proxy server.
+  * User and reset Plone site password through a Proxy server.
+  * Administrator could manage the sessions and monitor users through
+    the default Django admin application.
+
+0.1beta1
+--------
+
+  * User can login to a Plone site through a Proxy server.
+  * Multiple Plone sites are not support unless the Plone sites have single
+    sign on implemented.
+  * i18n support
