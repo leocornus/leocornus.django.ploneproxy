@@ -57,6 +57,7 @@ SESSION_COOKIE_NAME = 'ctssessionid'
 SESSION_COOKIE_AGE = 300
 # default is False.
 #SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 AUTHENTICATION_BACKENDS = (
     'leocornus.django.ploneproxy.authen.backends.PloneModelBackend',
