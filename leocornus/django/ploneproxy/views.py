@@ -5,8 +5,6 @@
 django view classes for leocornus.django.ploneproxy
 """
 
-import httplib2
-
 from django.conf import settings
 from django.contrib.auth import authenticate
 

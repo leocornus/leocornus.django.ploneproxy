@@ -173,7 +173,7 @@ def isResourcesRequest(req):
             req.unparsed_uri.endswith('jpg') or \
             req.unparsed_uri.endswith('png')):
         # not qualified.
-        return True
+        return False
 
     # everything looks fine now!
     return True

@@ -39,12 +39,12 @@ class PloneCookieMiddleware(object):
 
         if hasattr(request, 'user') and request.user.is_authenticated():
 
-            # this is a successfully logged is user.
+            # this is a successfully logged in user.
             try:
                 state = PloneAuthenState.objects.get(user_id=request.user.id)
                 response.set_cookie(str(state.cookie_name),
                                     state.cookie_value, path='/')
-                # housekeeping work!  We might need a seeting attribute to
+                # housekeeping work!  We might need a setting attribute to
                 # controle this.
                 state.delete()
             except PloneAuthenState.DoesNotExist:
