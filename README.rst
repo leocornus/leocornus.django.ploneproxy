@@ -1,3 +1,5 @@
+|pypi-version|_ |pypi-download|_ |pypi-license|_ 
+
 leocornus.django.ploneproxy
 ===========================
 
@@ -18,3 +20,9 @@ Plone's session (cookie).
 The Django application provides the login form and manages the 
 active session on proxy server layer.
 
+.. |pypi-version| image:: http://img.shields.io/pypi/v/leocornus.django.ploneproxy.svg
+.. _pypi-version: https://pypi.python.org/pypi/leocornus.django.ploneproxy
+.. |pypi-download| image:: http://img.shields.io/pypi/dm/leocornus.django.ploneproxy.svg
+.. _pypi-download: https://pypi.python.org/pypi/leocornus.django.ploneproxy
+.. |pypi-license| image:: http://img.shields.io/pypi/l/leocornus.django.ploneproxy.svg
+.. _pypi-license: https://pypi.python.org/pypi/leocornus.django.ploneproxy
